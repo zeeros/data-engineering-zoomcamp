@@ -467,3 +467,46 @@ Paste the output of this command into the homework submission form.
 - You can submit your homework multiple times. In this case, only the last submission will be used.
 
 Deadline: 29 January, 23:00 CET
+
+* Docker setup
+
+#+begin_src sh :session v :noweb yes :noweb-prefix no :results none
+echo '<<docker-compose-yml>>' | docker compose -f - up --detach &
+#+end_src
+
+#+begin_src sh :session v :noweb yes :noweb-prefix no :results none
+echo '<<docker-compose-yml>>' | docker compose -f - down &
+#+end_src
+
+#+name: python-dockerfile
+#+begin_src sh
+FROM python:3.9.1
+RUN apt-get install wget
+RUN pip install pandas sqlalchemy psycopg2
+WORKDIR /data
+#+end_src
+
+#+name: docker-compose-yml
+#+begin_src sh :noweb yes
+name: module-1
+services:
+  db:
+    image: postgres:16.1
+    environment:
+      - POSTGRES_USER=root
+      - POSTGRES_PASSWORD=root
+      - POSTGRES_DB=ny_taxi
+    volumes:
+      - "./ny_taxi_data/postgres:/var/lib/postgresql/data:rw"
+    ports:
+      - "5432:5432"
+  datapipeline:
+    build:
+      context: .
+      dockerfile_inline: |
+        <<python-dockerfile>>
+    depends_on: [db]
+    entrypoint: ["tail", "-f", "/dev/null"]
+    volumes:
+      - "./ny_taxi_data:/data:rw"
+#+end_src
