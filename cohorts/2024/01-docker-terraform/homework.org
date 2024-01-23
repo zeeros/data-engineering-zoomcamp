@@ -1,6 +1,14 @@
 #+title: Module 1 Homework
 
 * IN-PROGRESS Docker & SQL
+:PROPERTIES:
+:header-args:sql+: :engine postgresql
+:header-args:sql+: :dbhost localhost
+:header-args:sql+: :dbuser root
+:header-args:sql+: :dbpassword root
+:header-args:sql+: :database ny_taxi
+:header-args:sql+: :dbport 5432
+:END:
 ** Knowing docker tags
 
 Run the command to get information on Docker.
@@ -390,14 +398,132 @@ What is version of the package =wheel=?
 - [ ] =23.0.1=
 - [ ] =58.1.0=
 
-** TODO Prepare Postgres
+** Prepare Postgres
 
 Run Postgres and load data as shown in the videos.
 We'll use the [[https://github.com/DataTalksClub/nyc-tlc-data/releases/download/green/green_tripdata_2019-09.csv.gz][green taxi trips from September 2019]].
 You will also need the [[https://s3.amazonaws.com/nyc-tlc/misc/taxi+_zone_lookup.csv][dataset with zones]].
 Download this data and put it into Postgres (with jupyter notebooks or with a pipeline).
 
-** TODO Count records
+#+begin_src python :dir ./ny_taxi_data :mkdirp yes :results output
+import os
+from urllib import request
+
+def download_file(url, local_filename):
+    with request.urlopen(url) as response:
+        with open(local_filename, 'wb') as file:
+            while True:
+                chunk = response.read(1024)
+                if not chunk:
+                    break
+                file.write(chunk)
+
+def check_and_download(urls):
+    for url in urls:
+        filename = url.split("/")[-1]
+        if not os.path.isfile(filename):
+            print(f"Downloading {filename}...")
+            download_file(url, filename)
+            print(f"{filename} downloaded successfully.")
+        else:
+            print(f"{filename} already exists locally.")
+
+if __name__ == "__main__":
+    urls = [
+        "https://github.com/DataTalksClub/nyc-tlc-data/releases/download/green/green_tripdata_2019-09.csv.gz",
+        "https://s3.amazonaws.com/nyc-tlc/misc/taxi+_zone_lookup.csv"
+    ]
+
+    check_and_download(urls)
+#+end_src
+
+#+RESULTS:
+: Downloading green_tripdata_2019-09.csv.gz...
+: green_tripdata_2019-09.csv.gz downloaded successfully.
+: Downloading taxi+_zone_lookup.csv...
+: taxi+_zone_lookup.csv downloaded successfully.
+
+#+begin_src python :results output
+import sys
+
+import pandas as pd
+import psycopg2
+import sqlalchemy as sqla
+from datetime import datetime
+
+csv_file_path = './ny_taxi_data/green_tripdata_2019-09.csv.gz'
+
+csv_iter = pd.read_csv(
+    filepath_or_buffer=csv_file_path,
+    iterator=True,
+    chunksize=10**4,
+    parse_dates=['lpep_pickup_datetime', 'lpep_dropoff_datetime']
+)
+
+DB_HOST = 'localhost'
+DB_PORT = '5432'
+DB_NAME = 'ny_taxi'
+DB_USER = 'root'
+DB_PASSWORD = 'root'
+DB_TABLE = 'green_taxi_data'
+
+engine = sqla.create_engine(f'postgresql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}')
+
+for i, chunk in enumerate(csv_iter):
+    chunk.to_sql(
+        name=DB_TABLE,
+        con=engine,
+        if_exists='append'
+    )
+
+engine.dispose()
+
+print(f'Data written to PostgreSQL table "{DB_TABLE}".')
+#+end_src
+
+#+RESULTS:
+: Data written to PostgreSQL table "green_taxi_data".
+
+#+begin_src sql
+SELECT column_name, data_type
+FROM information_schema.columns
+WHERE table_name = 'green_taxi_data'
+#+end_src
+
+#+RESULTS:
+| column_name           | data_type                   |
+|-----------------------+-----------------------------|
+| congestion_surcharge  | double precision            |
+| VendorID              | bigint                      |
+| lpep_pickup_datetime  | timestamp without time zone |
+| lpep_dropoff_datetime | timestamp without time zone |
+| index                 | bigint                      |
+| RatecodeID            | bigint                      |
+| PULocationID          | bigint                      |
+| DOLocationID          | bigint                      |
+| passenger_count       | bigint                      |
+| trip_distance         | double precision            |
+| fare_amount           | double precision            |
+| extra                 | double precision            |
+| mta_tax               | double precision            |
+| tip_amount            | double precision            |
+| tolls_amount          | double precision            |
+| ehail_fee             | double precision            |
+| improvement_surcharge | double precision            |
+| total_amount          | double precision            |
+| payment_type          | bigint                      |
+| trip_type             | bigint                      |
+| store_and_fwd_flag    | text                        |
+
+#+begin_src sql
+SELECT COUNT(*) FROM green_taxi_data
+#+end_src
+
+#+RESULTS:
+|  count |
+|--------|
+| 449063 |
+
 
 How many taxi trips were totally made on September 18th 2019?
 
