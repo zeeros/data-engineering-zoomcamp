@@ -549,14 +549,29 @@ WHERE DATE(lpep_pickup_datetime) = '2019-09-18'
 - [ ] =15859=
 - [ ] =89009=
 
-** TODO Largest trip for each day
+** Largest trip for each day
 
 Which was the pick up day with the largest trip distance?
 Use the pick up time for your calculations.
 
+#+begin_src sql
+SELECT
+  DATE_TRUNC('day', lpep_pickup_datetime) AS pickup_day,
+  SUM(trip_distance) AS total_trip_distance
+FROM green_taxi_data
+GROUP BY pickup_day
+ORDER BY total_trip_distance DESC
+LIMIT 1;
+#+end_src
+
+#+RESULTS:
+| pickup_day          | total_trip_distance |
+|---------------------+---------------------|
+| 2019-09-26 00:00:00 |    58759.9400000002 |
+
 - [ ] =2019-09-18=
 - [ ] =2019-09-16=
-- [ ] =2019-09-26=
+- [X] =2019-09-26=
 - [ ] =2019-09-21=
 
 ** TODO The number of passengers
