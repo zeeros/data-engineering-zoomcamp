@@ -445,44 +445,59 @@ if __name__ == "__main__":
 
 #+begin_src python :results output
 import sys
-
-import pandas as pd
 import psycopg2
 import sqlalchemy as sqla
 from datetime import datetime
-
-csv_file_path = './ny_taxi_data/green_tripdata_2019-09.csv.gz'
-
-csv_iter = pd.read_csv(
-    filepath_or_buffer=csv_file_path,
-    iterator=True,
-    chunksize=10**4,
-    parse_dates=['lpep_pickup_datetime', 'lpep_dropoff_datetime']
-)
+import pandas as pd
 
 DB_HOST = 'localhost'
 DB_PORT = '5432'
 DB_NAME = 'ny_taxi'
 DB_USER = 'root'
 DB_PASSWORD = 'root'
-DB_TABLE = 'green_taxi_data'
 
 engine = sqla.create_engine(f'postgresql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}')
 
-for i, chunk in enumerate(csv_iter):
-    chunk.to_sql(
-        name=DB_TABLE,
-        con=engine,
-        if_exists='append'
+def load_csv_to_sql(csv_file_path, table_name, engine, parse_dates=None, chunksize=None):
+    df = pd.read_csv(
+        filepath_or_buffer=csv_file_path,
+        parse_dates=parse_dates,
+        nrows=1000
     )
 
-engine.dispose()
+    df.head(n=0).to_sql(name=table_name, con=engine, if_exists='replace')
 
-print(f'Data written to PostgreSQL table "{DB_TABLE}".')
+    csv_iter = pd.read_csv(
+        filepath_or_buffer=csv_file_path,
+        iterator=True,
+        chunksize=chunksize,
+        parse_dates=parse_dates
+    )
+
+    for i, chunk in enumerate(csv_iter):
+        chunk.to_sql(name=table_name, con=engine, if_exists='append')
+
+    print(f'Data written to table "{table_name}".')
+
+load_csv_to_sql(
+    csv_file_path='./ny_taxi_data/green_tripdata_2019-09.csv.gz',
+    table_name='green_taxi_data',
+    engine=engine,
+    parse_dates=['lpep_pickup_datetime', 'lpep_dropoff_datetime'],
+    chunksize=10**4
+)
+load_csv_to_sql(
+    csv_file_path='./ny_taxi_data/taxi+_zone_lookup.csv',
+    table_name='taxi_zone',
+    engine=engine
+)
+
+engine.dispose()
 #+end_src
 
 #+RESULTS:
-: Data written to PostgreSQL table "green_taxi_data".
+: Data written to table "green_taxi_data".
+: Data written to table "taxi_zone".
 
 #+begin_src sql
 SELECT column_name, data_type
@@ -523,6 +538,30 @@ SELECT COUNT(*) FROM green_taxi_data
 |  count |
 |--------|
 | 449063 |
+
+#+begin_src sql
+SELECT column_name, data_type
+FROM information_schema.columns
+WHERE table_name = 'taxi_zone'
+#+end_src
+
+#+RESULTS:
+| column_name  | data_type |
+|--------------+-----------|
+| index        | bigint    |
+| LocationID   | bigint    |
+| Borough      | text      |
+| Zone         | text      |
+| service_zone | text      |
+
+#+begin_src sql
+SELECT COUNT(*) FROM taxi_zone
+#+end_src
+
+#+RESULTS:
+| count |
+|-------|
+|   265 |
 
 ** Count records
 
