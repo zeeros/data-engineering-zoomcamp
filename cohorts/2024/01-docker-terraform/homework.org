@@ -613,12 +613,29 @@ LIMIT 1;
 - [X] =2019-09-26=
 - [ ] =2019-09-21=
 
-** TODO The number of passengers
+** The number of passengers
 
 Consider =lpep_pickup_datetime= in =2019-09-18= and ignore =Borough= has =Unknown=.
 Which were the 3 pick up Boroughs that had a sum of =total_amount= superior to 50000?
 
-- [ ] =Brooklyn, Manhattan, Queens=
+#+begin_src sql
+SELECT "Borough", SUM(total_amount) AS total_amount_sum
+FROM green_taxi_data LEFT JOIN taxi_zone
+  ON "PULocationID" = "LocationID"
+WHERE DATE(lpep_pickup_datetime) = '2019-09-18'
+GROUP BY "Borough"
+HAVING SUM(total_amount) > 50000
+ORDER BY total_amount_sum DESC
+#+end_src
+
+#+RESULTS:
+| Borough   |  total_amount_sum |
+|-----------+-------------------|
+| Brooklyn  | 96333.23999999902 |
+| Manhattan | 92271.29999999839 |
+| Queens    | 78671.70999999889 |
+
+- [X] =Brooklyn, Manhattan, Queens=
 - [ ] =Bronx, Brooklyn, Manhattan=
 - [ ] =Bronx, Manhattan, Queens=
 - [ ] =Brooklyn, Queens, Staten Island=
