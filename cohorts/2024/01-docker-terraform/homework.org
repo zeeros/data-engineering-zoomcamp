@@ -613,7 +613,7 @@ LIMIT 1;
 - [X] =2019-09-26=
 - [ ] =2019-09-21=
 
-** The number of passengers
+** Three biggest pick up Boroughs
 
 Consider =lpep_pickup_datetime= in =2019-09-18= and ignore =Borough= has =Unknown=.
 Which were the 3 pick up Boroughs that had a sum of =total_amount= superior to 50000?
@@ -683,7 +683,7 @@ LIMIT 1;
 In this section homework we'll prepare the environment by creating resources in GCP with Terraform.
 
 In your VM on GCP/Laptop/GitHub Codespace install Terraform.
-Copy the files from the course repo [[https://github.com/DataTalksClub/data-engineering-zoomcamp/tree/main/week_1_basics_n_setup/1_terraform_gcp/terraform][here]] to your VM/Laptop/GitHub Codespace.
+Copy the files from the course repo [[https://github.com/DataTalksClub/data-engineering-zoomcamp/tree/main/01-docker-terraform/1_terraform_gcp/terraform][here]] to your VM/Laptop/GitHub Codespace.
 
 Modify the files as necessary to create a GCP Bucket and Big Query Dataset.
 
@@ -699,7 +699,7 @@ Paste the output of this command into the homework submission form.
 
 ** TODO Submitting the solutions
 
-- Form for submitting:
+- Form for submitting: https://courses.datatalks.club/de-zoomcamp-2024/homework/hw01
 - You can submit your homework multiple times. In this case, only the last submission will be used.
 
 Deadline: 29 January, 23:00 CET
