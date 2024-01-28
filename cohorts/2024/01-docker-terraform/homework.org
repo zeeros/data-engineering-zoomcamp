@@ -1,6 +1,6 @@
 #+title: Module 1 Homework
 
-* IN-PROGRESS Docker & SQL
+* Docker & SQL
 :PROPERTIES:
 :header-args:sql+: :engine postgresql
 :header-args:sql+: :dbhost localhost
@@ -640,16 +640,42 @@ ORDER BY total_amount_sum DESC
 - [ ] =Bronx, Manhattan, Queens=
 - [ ] =Brooklyn, Queens, Staten Island=
 
-** TODO Largest tip
+** Largest tip
 
 For the passengers picked up in September 2019 in the zone name =Astoria= which was the drop off zone that had the largest tip?
 We want the name of the zone, not the id.
 
 Note: it's not a typo, it's =tip= , not =trip=
 
+#+begin_src sql
+SELECT
+    tz_dropoff."Zone" AS dropoff_zone_name,
+    MAX(gt.tip_amount) AS max_tip_amount
+FROM
+    green_taxi_data gt
+JOIN
+    taxi_zone tz_pickup ON gt."PULocationID" = tz_pickup."LocationID"
+JOIN
+    taxi_zone tz_dropoff ON gt."DOLocationID" = tz_dropoff."LocationID"
+WHERE
+    tz_pickup."Zone" = 'Astoria'
+    AND EXTRACT(MONTH FROM gt."lpep_pickup_datetime") = 9
+    AND EXTRACT(YEAR FROM gt."lpep_pickup_datetime") = 2019
+GROUP BY
+    tz_dropoff."Zone"
+ORDER BY
+    max_tip_amount DESC
+LIMIT 1;
+#+end_src
+
+#+RESULTS:
+| dropoff_zone_name | max_tip_amount |
+|-------------------+----------------|
+| JFK Airport       |          62.31 |
+
 - [ ] =Central Park=
 - [ ] =Jamaica=
-- [ ] =JFK Airport=
+- [X] =JFK Airport=
 - [ ] =Long Island City/Queens Plaza=
 
 * TODO Terraform
