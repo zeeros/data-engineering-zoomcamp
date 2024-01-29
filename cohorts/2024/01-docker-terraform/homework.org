@@ -2,6 +2,8 @@
 
 * Docker & SQL
 :PROPERTIES:
+:header-args+: :eval never-export
+:header-args+: :exports both
 :header-args:sql+: :engine postgresql
 :header-args:sql+: :dbhost localhost
 :header-args:sql+: :dbuser root
