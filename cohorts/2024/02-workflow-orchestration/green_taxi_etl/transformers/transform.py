@@ -7,16 +7,19 @@ if 'test' not in globals():
 
 @transformer
 def transform(data, *args, **kwargs):
-    data = data.rename(
-        columns={
-            'VendorID': 'vendor_id',
-            'RatecodeID': 'rate_code_id',
-            'PULocationID': 'pu_location_id',
-            'DOLocationID': 'do_location_id'
-        })
-    data = data.loc[(data['passenger_count'] > 0) & (data['trip_distance'] > 0)]
-    data = data.assign(lpep_pickup_date=data['lpep_pickup_datetime'].dt.date)
-    return data
+    return (
+        data
+        .rename(
+            columns={
+                'VendorID': 'vendor_id',
+                'RatecodeID': 'rate_code_id',
+                'PULocationID': 'pu_location_id',
+                'DOLocationID': 'do_location_id'
+            }
+        )
+        .loc[(data['passenger_count'] > 0) & (data['trip_distance'] > 0)]
+        .assign(lpep_pickup_date=lambda x: x['lpep_pickup_datetime'].dt.date)
+    )
 
 @test
 def test_output(output, *args) -> None:
