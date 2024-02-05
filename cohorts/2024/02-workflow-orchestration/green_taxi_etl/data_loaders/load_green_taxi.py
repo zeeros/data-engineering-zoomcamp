@@ -37,7 +37,7 @@ def load_data_from_api(*args, **kwargs):
             "https://github.com/DataTalksClub/nyc-tlc-data/releases/download/green/green_tripdata_2020-11.csv.gz",
             "https://github.com/DataTalksClub/nyc-tlc-data/releases/download/green/green_tripdata_2020-12.csv.gz"
         ]
-    ]).rename(columns=lambda x: x.lower().replace(' ', '_'))
+    ])
 
 
 @test
