@@ -38,6 +38,7 @@ blocks:
   configuration: {}
   downstream_blocks:
   - green_taxi_2_gcn_partitioned_parquet
+  - green_taxi_pg
   executor_config: null
   executor_type: local_python
   has_callback: false
@@ -50,6 +51,22 @@ blocks:
   upstream_blocks:
   - load_green_taxi
   uuid: transform
+- all_upstream_blocks_executed: true
+  color: null
+  configuration: {}
+  downstream_blocks: []
+  executor_config: null
+  executor_type: local_python
+  has_callback: false
+  language: python
+  name: green_taxi_pg
+  retry_config: null
+  status: executed
+  timeout: null
+  type: data_exporter
+  upstream_blocks:
+  - transform
+  uuid: green_taxi_pg
 cache_block_output_in_memory: false
 callbacks: []
 concurrency_config: {}
@@ -71,7 +88,7 @@ settings:
 spark_config: {}
 tags: []
 type: python
-updated_at: '2024-02-05 14:43:36'
+updated_at: '2024-02-06 10:45:06'
 uuid: green_taxi_etl
 variables_dir: /home/src/mage_data/magic-zoomcamp
 widgets: []
