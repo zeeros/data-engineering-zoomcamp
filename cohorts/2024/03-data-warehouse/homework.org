@@ -91,8 +91,12 @@ SELECT * FROM terraform-module-1.nytaxi.green_tripdata_external;
 
 What is count of records for the 2022 Green Taxi Data?
 
+#+begin_src sql
+SELECT COUNT(*) FROM terraform-module-1.nytaxi.green_tripdata_external
+#+end_src
+
 - [ ] 65,623,481
-- [ ] 840,402
+- [X] 840,402
 - [ ] 1,936,423
 - [ ] 253,647
 
