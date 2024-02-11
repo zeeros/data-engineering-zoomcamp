@@ -185,7 +185,7 @@ WHERE DATE(lpep_pickup_datetime) BETWEEN '2022-06-01' AND '2022-06-30';
 Where is the data stored in the External Table you created?
 
 - [ ] Big Query
-- [ ] GCP Bucket
+- [X] GCP Bucket
 - [ ] Big Table
 - [ ] Container Registry
 
