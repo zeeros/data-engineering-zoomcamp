@@ -123,10 +123,16 @@ This information is displayed on the top right corner of any query tab.
 
 How many records have a =fare_amount= of 0?
 
+#+begin_src sql
+SELECT COUNT(*)
+FROM terraform-module-1.nytaxi.green_tripdata_no_partition
+WHERE fare_amount=0;
+#+end_src
+
 - [ ] 12,488
 - [ ] 128,219
 - [ ] 112
-- [ ] 1,622
+- [X] 1,622
 
 * Best strategy for query
 
