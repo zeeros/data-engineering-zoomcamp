@@ -201,6 +201,14 @@ It is best practice in Big Query to always cluster your data:
 No Points: Write a =SELECT count(*)= query FROM the materialized table
 you created. How many bytes does it estimate will be read? Why?
 
+#+begin_src sql
+SELECT count(*)
+FROM terraform-module-1.nytaxi.green_tripdata_no_partition;
+#+end_src
+
+Zero bytes, since BigQuery relies on metadata statistics to estimate the number of rows without reading all the data.
+This is an example of a "metadata-only" operation.
+
 * Submitting the solutions
 
 - Form for submitting: https://courses.datatalks.club/de-zoomcamp-2024/homework/hw3
