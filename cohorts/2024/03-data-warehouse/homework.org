@@ -163,8 +163,20 @@ What are these values?
 
 Choose the answer which most closely matches.
 
+#+begin_src sql
+SELECT COUNT(DISTINCT PULocationID)
+FROM terraform-module-1.nytaxi.green_tripdata_partitioned_clustered
+WHERE DATE(lpep_pickup_datetime) BETWEEN '2022-06-01' AND '2022-06-30';
+#+end_src
+
+#+begin_src sql
+SELECT COUNT(DISTINCT PULocationID)
+FROM terraform-module-1.nytaxi.green_tripdata_no_partition
+WHERE DATE(lpep_pickup_datetime) BETWEEN '2022-06-01' AND '2022-06-30';
+#+end_src
+
 - [ ] 22.82 MB for non-partitioned table and 647.87 MB for the partitioned table
-- [ ] 12.82 MB for non-partitioned table and 1.12 MB for the partitioned table
+- [X] 12.82 MB for non-partitioned table and 1.12 MB for the partitioned table
 - [ ] 5.63 MB for non-partitioned table and 0 MB for the partitioned table
 - [ ] 10.31 MB for non-partitioned table and 10.31 MB for the partitioned table
 
