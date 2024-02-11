@@ -138,8 +138,18 @@ WHERE fare_amount=0;
 
 What is the best strategy to make an optimized table in Big Query if your query will always order the results by =PUlocationID= and filter based on =lpep_pickup_datetime=? (Create a new table with this strategy)
 
+Partitioning helps pruning the data efficiently during query execution.
+Clustering involves physically ordering the data within each partition based on a chosen column.
+
+#+begin_src sql
+CREATE OR REPLACE TABLE terraform-module-1.nytaxi.green_tripdata_partitioned_clustered
+PARTITION BY DATE(lpep_pickup_datetime)
+CLUSTER BY PULocationID AS
+SELECT * FROM terraform-module-1.nytaxi.green_tripdata_external;
+#+end_src
+
 - [ ] Cluster on =lpep_pickup_datetime= Partition by =PUlocationID=
-- [ ] Partition by =lpep_pickup_datetime= Cluster on =PUlocationID=
+- [X] Partition by =lpep_pickup_datetime= Cluster on =PUlocationID=.
 - [ ] Partition by =lpep_pickup_datetime= and Partition by =PUlocationID=
 - [ ] Cluster on by =lpep_pickup_datetime= and Cluster on =PUlocationID=
 
