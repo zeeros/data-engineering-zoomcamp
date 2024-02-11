@@ -1,8 +1,91 @@
 #+title: Module 3 Homework
 
-Using the [[https://www.nyc.gov/site/tlc/about/tlc-trip-record-data.page][2022 Green Taxi Trip Record Parquet files]]
-1. Create an external table
-2. Create a table in BigQuery (without partitioning or clustering)
+First, download the [[https://www.nyc.gov/site/tlc/about/tlc-trip-record-data.page][2022 Green Taxi Trip Record Parquet files]] and save them inside ~./data/~.
+
+#+begin_src python :results output
+import os
+import requests
+
+data_directory = "./data"
+os.makedirs(data_directory, exist_ok=True)
+
+url_template = "https://d37ci6vzurychx.cloudfront.net/trip-data/green_tripdata_2022-{}.parquet"
+for xx in range(1, 13):
+    url = url_template.format(str(xx).zfill(2))
+    file_path = os.path.join(data_directory, f"green_tripdata_2022-{str(xx).zfill(2)}.parquet")
+    response = requests.get(url)
+
+    if response.status_code == 200:
+        with open(file_path, 'wb') as file:
+            file.write(response.content)
+        print(f"File {file_path} downloaded successfully")
+    else:
+        print(f"Failed to download file {file_path}, status code: {response.status_code}")
+#+end_src
+
+#+RESULTS:
+#+begin_example
+File ./data/green_tripdata_2022-01.parquet downloaded successfully
+File ./data/green_tripdata_2022-02.parquet downloaded successfully
+File ./data/green_tripdata_2022-03.parquet downloaded successfully
+File ./data/green_tripdata_2022-04.parquet downloaded successfully
+File ./data/green_tripdata_2022-05.parquet downloaded successfully
+File ./data/green_tripdata_2022-06.parquet downloaded successfully
+File ./data/green_tripdata_2022-07.parquet downloaded successfully
+File ./data/green_tripdata_2022-08.parquet downloaded successfully
+File ./data/green_tripdata_2022-09.parquet downloaded successfully
+File ./data/green_tripdata_2022-10.parquet downloaded successfully
+File ./data/green_tripdata_2022-11.parquet downloaded successfully
+File ./data/green_tripdata_2022-12.parquet downloaded successfully
+#+end_example
+
+Upload the files stored in ~./data/~ to Google Cloud Storage.
+
+#+begin_src python :results output
+import os
+from google.cloud import storage
+
+client = storage.Client.from_service_account_json('credentials.json')
+bucket = client.get_bucket('module-3-kfghnfj')
+data_dir = './data/'
+for filename in os.listdir(data_dir):
+    local_file_path = os.path.join(data_dir, filename)
+    bucket.blob(filename).upload_from_filename(local_file_path)
+    print(f'File {filename} uploaded to {bucket.name}')
+#+end_src
+
+#+RESULTS:
+#+begin_example
+File green_tripdata_2022-09.parquet uploaded to module-3-kfghnfj
+File green_tripdata_2022-02.parquet uploaded to module-3-kfghnfj
+File green_tripdata_2022-08.parquet uploaded to module-3-kfghnfj
+File green_tripdata_2022-03.parquet uploaded to module-3-kfghnfj
+File green_tripdata_2022-10.parquet uploaded to module-3-kfghnfj
+File green_tripdata_2022-04.parquet uploaded to module-3-kfghnfj
+File green_tripdata_2022-11.parquet uploaded to module-3-kfghnfj
+File green_tripdata_2022-12.parquet uploaded to module-3-kfghnfj
+File green_tripdata_2022-06.parquet uploaded to module-3-kfghnfj
+File green_tripdata_2022-07.parquet uploaded to module-3-kfghnfj
+File green_tripdata_2022-01.parquet uploaded to module-3-kfghnfj
+File green_tripdata_2022-05.parquet uploaded to module-3-kfghnfj
+#+end_example
+
+In BigQuery, create an external table using the Parquet files in Google Cloud Storage.
+
+#+begin_src sql
+CREATE OR REPLACE EXTERNAL TABLE `terraform-module-1.nytaxi.green_tripdata_external`
+OPTIONS (
+  format = 'Parquet',
+  uris = ['gs://module-3-kfghnfj/green_tripdata_2022-*.parquet']
+);
+#+end_src
+
+In BigQuery, create a table without partitioning or clustering.
+
+#+begin_src sql
+CREATE OR REPLACE TABLE terraform-module-1.nytaxi.green_tripdata_no_partition AS
+SELECT * FROM terraform-module-1.nytaxi.green_tripdata_external;
+#+end_src
 
 * Count records
 
