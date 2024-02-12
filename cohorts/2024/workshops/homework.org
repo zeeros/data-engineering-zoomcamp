@@ -93,7 +93,12 @@ pipeline = dlt.pipeline(
     destination='duckdb',
     dataset_name='people'
 )
+#+end_src
 
+#+RESULTS:
+
+#+name: pipeline-run-replace
+#+begin_src python :session *workshop-1-data-ingestion*
 pipeline.run(
     people_1(),
     table_name="people",
@@ -101,11 +106,11 @@ pipeline.run(
 )
 #+end_src
 
-#+RESULTS:
-: Pipeline dlt_pipeline load step completed in 0.16 seconds
+#+RESULTS: pipeline-run-replace
+: Pipeline dlt_pipeline load step completed in 0.17 seconds
 : 1 load package(s) were loaded to destination duckdb and into dataset people
 : The duckdb destination used duckdb:////home/i2cat/src/data-engineering-zoomcamp/workshop-1/cohorts/2024/workshops/dlt_pipeline.duckdb location to store data
-: Load package 1707743283.7601106 is LOADED and contains no failed jobs
+: Load package 1707745554.6916213 is LOADED and contains no failed jobs
 
 #+begin_src python :session *workshop-1-data-ingestion*
 import duckdb
