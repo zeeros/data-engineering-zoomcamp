@@ -1,0 +1,39 @@
+#+title: Workshop 1 - Data Ingestion
+
+* Use a generator
+
+#+begin_src python :results output :session *workshop-1-data-ingestion*
+def square_root_generator(limit):
+    n = 1
+    while n <= limit:
+        yield n ** 0.5
+        n += 1
+
+# Example usage:
+limit = 5
+generator = square_root_generator(limit)
+
+for sqrt_value in generator:
+    print(sqrt_value)
+#+end_src
+
+#+RESULTS:
+: 1.0
+: 1.4142135623730951
+: 1.7320508075688772
+: 2.0
+: 2.23606797749979
+
+** What is the sum of the outputs of the generator for limit = 5?
+
+#+begin_src python :session *workshop-1-data-ingestion*
+sum([sqrt_value for sqrt_value in square_root_generator(limit=5)])
+#+end_src
+
+#+RESULTS:
+: 8.382332347441762
+
+- [ ] 10.23433234744176
+- [ ] 7.892332347441762
+- [X] 8.382332347441762
+- [ ] 9.123332347441762
