@@ -51,3 +51,144 @@ sum([sqrt_value for sqrt_value in square_root_generator(limit=5)])
 - [X] 3.605551275463989
 - [ ] 2.345551275463989
 - [ ] 5.678551275463989
+
+* Append and merge generators
+
+#+begin_src python :results output :session *workshop-1-data-ingestion*
+def people_1():
+    for i in range(1, 6):
+        yield {"ID": i, "Name": f"Person_{i}", "Age": 25 + i, "City": "City_A"}
+
+for person in people_1():
+    print(person)
+
+def people_2():
+    for i in range(3, 9):
+        yield {"ID": i, "Name": f"Person_{i}", "Age": 30 + i, "City": "City_B", "Occupation": f"Job_{i}"}
+
+for person in people_2():
+    print(person)
+#+end_src
+
+#+RESULTS:
+#+begin_example
+{'ID': 1, 'Name': 'Person_1', 'Age': 26, 'City': 'City_A'}
+{'ID': 2, 'Name': 'Person_2', 'Age': 27, 'City': 'City_A'}
+{'ID': 3, 'Name': 'Person_3', 'Age': 28, 'City': 'City_A'}
+{'ID': 4, 'Name': 'Person_4', 'Age': 29, 'City': 'City_A'}
+{'ID': 5, 'Name': 'Person_5', 'Age': 30, 'City': 'City_A'}
+{'ID': 3, 'Name': 'Person_3', 'Age': 33, 'City': 'City_B', 'Occupation': 'Job_3'}
+{'ID': 4, 'Name': 'Person_4', 'Age': 34, 'City': 'City_B', 'Occupation': 'Job_4'}
+{'ID': 5, 'Name': 'Person_5', 'Age': 35, 'City': 'City_B', 'Occupation': 'Job_5'}
+{'ID': 6, 'Name': 'Person_6', 'Age': 36, 'City': 'City_B', 'Occupation': 'Job_6'}
+{'ID': 7, 'Name': 'Person_7', 'Age': 37, 'City': 'City_B', 'Occupation': 'Job_7'}
+{'ID': 8, 'Name': 'Person_8', 'Age': 38, 'City': 'City_B', 'Occupation': 'Job_8'}
+#+end_example
+
+
+#+begin_src python :session *workshop-1-data-ingestion*
+import dlt
+
+pipeline = dlt.pipeline(
+    destination='duckdb',
+    dataset_name='people'
+)
+
+pipeline.run(
+    people_1(),
+    table_name="people",
+    write_disposition="replace"
+)
+#+end_src
+
+#+RESULTS:
+: Pipeline dlt_pipeline load step completed in 0.16 seconds
+: 1 load package(s) were loaded to destination duckdb and into dataset people
+: The duckdb destination used duckdb:////home/i2cat/src/data-engineering-zoomcamp/workshop-1/cohorts/2024/workshops/dlt_pipeline.duckdb location to store data
+: Load package 1707743283.7601106 is LOADED and contains no failed jobs
+
+#+begin_src python :session *workshop-1-data-ingestion*
+import duckdb
+
+conn = duckdb.connect(f"{pipeline.pipeline_name}.duckdb")
+
+conn.sql(f"SET search_path = '{pipeline.dataset_name}'")
+conn.sql("show tables")
+#+end_src
+
+#+RESULTS:
+: ┌─────────────────────┐
+: │        name         │
+: │       varchar       │
+: ├─────────────────────┤
+: │ _dlt_loads          │
+: │ _dlt_pipeline_state │
+: │ _dlt_version        │
+: │ people              │
+: └─────────────────────┘
+
+#+begin_src python :session *workshop-1-data-ingestion*
+conn.sql("SELECT * FROM people").df()
+#+end_src
+
+#+RESULTS:
+:    id      name  age    city        _dlt_load_id         _dlt_id occupation
+: 0   1  Person_1   26  City_A  1707743283.7601106  ze0BGwNg9TObzg       None
+: 1   2  Person_2   27  City_A  1707743283.7601106  B91o7NqhrR3DOg       None
+: 2   3  Person_3   28  City_A  1707743283.7601106  QBjE1P3eudw4ng       None
+: 3   4  Person_4   29  City_A  1707743283.7601106  WBRSOZkhEvTADQ       None
+: 4   5  Person_5   30  City_A  1707743283.7601106  YsakjdPF/Wq3tg       None
+
+* Append generators
+
+Append the 2 generators.
+
+#+begin_src python :session *workshop-1-data-ingestion*
+pipeline.run(
+    people_2(),
+    table_name="people",
+    write_disposition="append"
+)
+#+end_src
+
+#+RESULTS:
+: Pipeline dlt_pipeline load step completed in 0.14 seconds
+: 1 load package(s) were loaded to destination duckdb and into dataset people
+: The duckdb destination used duckdb:////home/i2cat/src/data-engineering-zoomcamp/workshop-1/cohorts/2024/workshops/dlt_pipeline.duckdb location to store data
+: Load package 1707743300.7298248 is LOADED and contains no failed jobs
+
+
+#+begin_src python :session *workshop-1-data-ingestion*
+conn.sql("SELECT * FROM people").df()
+#+end_src
+
+#+RESULTS:
+#+begin_example
+    id      name  age    city        _dlt_load_id         _dlt_id occupation
+0    1  Person_1   26  City_A  1707743283.7601106  ze0BGwNg9TObzg       None
+1    2  Person_2   27  City_A  1707743283.7601106  B91o7NqhrR3DOg       None
+2    3  Person_3   28  City_A  1707743283.7601106  QBjE1P3eudw4ng       None
+3    4  Person_4   29  City_A  1707743283.7601106  WBRSOZkhEvTADQ       None
+4    5  Person_5   30  City_A  1707743283.7601106  YsakjdPF/Wq3tg       None
+5    3  Person_3   33  City_B  1707743300.7298248  itJQiT0E9qHUiQ      Job_3
+6    4  Person_4   34  City_B  1707743300.7298248  qoGybsUltTeRRQ      Job_4
+7    5  Person_5   35  City_B  1707743300.7298248  oydAGWOyUmE5bg      Job_5
+8    6  Person_6   36  City_B  1707743300.7298248  LaF7c4kJm+963A      Job_6
+9    7  Person_7   37  City_B  1707743300.7298248  MX7yUkirZE0Baw      Job_7
+10   8  Person_8   38  City_B  1707743300.7298248  0VQWCm4c9wgDSw      Job_8
+#+end_example
+
+After correctly appending the data, calculate the sum of all ages of people.
+
+#+begin_src python :session *workshop-1-data-ingestion*
+conn.sql("SELECT SUM(age) FROM people").df()
+#+end_src
+
+#+RESULTS:
+:    sum(age)
+: 0     353.0
+
+- [X] 353
+- [ ] 365
+- [ ] 378
+- [ ] 390
