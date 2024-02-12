@@ -37,3 +37,17 @@ sum([sqrt_value for sqrt_value in square_root_generator(limit=5)])
 - [ ] 7.892332347441762
 - [X] 8.382332347441762
 - [ ] 9.123332347441762
+
+** What is the 13th number yielded by the generator?
+
+#+begin_src python :session *workshop-1-data-ingestion*
+[sqrt_value for sqrt_value in square_root_generator(limit=13)][12]
+#+end_src
+
+#+RESULTS:
+: 3.605551275463989
+
+- [ ] 4.236551275463989
+- [X] 3.605551275463989
+- [ ] 2.345551275463989
+- [ ] 5.678551275463989
