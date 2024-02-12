@@ -1,8 +1,11 @@
 #+title: Workshop 1 - Data Ingestion
 
 * Use a generator
+:PROPERTIES:
+:header-args+: :session *workshop-1-data-ingestion*
+:END:
 
-#+begin_src python :results output :session *workshop-1-data-ingestion*
+#+begin_src python :results output
 def square_root_generator(limit):
     n = 1
     while n <= limit:
@@ -26,7 +29,7 @@ for sqrt_value in generator:
 
 ** What is the sum of the outputs of the generator for limit = 5?
 
-#+begin_src python :session *workshop-1-data-ingestion*
+#+begin_src python
 sum([sqrt_value for sqrt_value in square_root_generator(limit=5)])
 #+end_src
 
@@ -40,7 +43,7 @@ sum([sqrt_value for sqrt_value in square_root_generator(limit=5)])
 
 ** What is the 13th number yielded by the generator?
 
-#+begin_src python :session *workshop-1-data-ingestion*
+#+begin_src python
 [sqrt_value for sqrt_value in square_root_generator(limit=13)][12]
 #+end_src
 
@@ -53,8 +56,12 @@ sum([sqrt_value for sqrt_value in square_root_generator(limit=5)])
 - [ ] 5.678551275463989
 
 * Append and merge generators
+:PROPERTIES:
+:header-args+: :session *workshop-1-data-ingestion*
+:header-args+: :noweb yes
+:END:
 
-#+begin_src python :results output :session *workshop-1-data-ingestion*
+#+begin_src python :results output
 def people_1():
     for i in range(1, 6):
         yield {"ID": i, "Name": f"Person_{i}", "Age": 25 + i, "City": "City_A"}
@@ -86,7 +93,7 @@ for person in people_2():
 #+end_example
 
 
-#+begin_src python :session *workshop-1-data-ingestion*
+#+begin_src python
 import dlt
 
 pipeline = dlt.pipeline(
@@ -98,7 +105,7 @@ pipeline = dlt.pipeline(
 #+RESULTS:
 
 #+name: pipeline-run-replace
-#+begin_src python :session *workshop-1-data-ingestion*
+#+begin_src python
 pipeline.run(
     people_1(),
     table_name="people",
@@ -112,7 +119,7 @@ pipeline.run(
 : The duckdb destination used duckdb:////home/i2cat/src/data-engineering-zoomcamp/workshop-1/cohorts/2024/workshops/dlt_pipeline.duckdb location to store data
 : Load package 1707745554.6916213 is LOADED and contains no failed jobs
 
-#+begin_src python :session *workshop-1-data-ingestion*
+#+begin_src python
 import duckdb
 
 conn = duckdb.connect(f"{pipeline.pipeline_name}.duckdb")
@@ -132,7 +139,7 @@ conn.sql("show tables")
 : │ people              │
 : └─────────────────────┘
 
-#+begin_src python :session *workshop-1-data-ingestion*
+#+begin_src python
 conn.sql("SELECT * FROM people").df()
 #+end_src
 
@@ -144,11 +151,11 @@ conn.sql("SELECT * FROM people").df()
 : 3   4  Person_4   29  City_A  1707743283.7601106  WBRSOZkhEvTADQ       None
 : 4   5  Person_5   30  City_A  1707743283.7601106  YsakjdPF/Wq3tg       None
 
-* Append generators
+** Append generators
 
 Append the 2 generators.
 
-#+begin_src python :session *workshop-1-data-ingestion*
+#+begin_src python
 pipeline.run(
     people_2(),
     table_name="people",
@@ -163,7 +170,7 @@ pipeline.run(
 : Load package 1707743300.7298248 is LOADED and contains no failed jobs
 
 
-#+begin_src python :session *workshop-1-data-ingestion*
+#+begin_src python
 conn.sql("SELECT * FROM people").df()
 #+end_src
 
@@ -186,7 +193,7 @@ conn.sql("SELECT * FROM people").df()
 After correctly appending the data, calculate the sum of all ages of people.
 
 #+name: sql-sum-age
-#+begin_src python :session *workshop-1-data-ingestion*
+#+begin_src python
 conn.sql("SELECT SUM(age) FROM people").df()
 #+end_src
 
@@ -199,11 +206,11 @@ conn.sql("SELECT SUM(age) FROM people").df()
 - [ ] 378
 - [ ] 390
 
-* Merge generators
+** Merge generators
 
 Merge the 2 generators using the ID column.
 
-#+begin_src python :session *workshop-1-data-ingestion* :noweb yes
+#+begin_src python
 <<pipeline-run-replace>>
 
 pipeline.run(
@@ -220,7 +227,7 @@ pipeline.run(
 : The duckdb destination used duckdb:////home/i2cat/src/data-engineering-zoomcamp/workshop-1/cohorts/2024/workshops/dlt_pipeline.duckdb location to store data
 : Load package 1707745580.9475884 is LOADED and contains no failed jobs
 
-#+begin_src python :session *workshop-1-data-ingestion*
+#+begin_src python
 conn.sql("SELECT * FROM people").df()
 #+end_src
 
@@ -237,7 +244,7 @@ conn.sql("SELECT * FROM people").df()
 
 Calculate the sum of ages of all the people loaded as described above.
 
-#+begin_src python :session *workshop-1-data-ingestion* :noweb yes
+#+begin_src python
 <<sql-sum-age>>
 #+end_src
 
