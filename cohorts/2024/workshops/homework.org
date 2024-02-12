@@ -5,7 +5,7 @@
 :header-args+: :session *workshop-1-data-ingestion*
 :END:
 
-#+begin_src python :results output
+#+begin_src python :results list
 def square_root_generator(limit):
     n = 1
     while n <= limit:
@@ -16,16 +16,15 @@ def square_root_generator(limit):
 limit = 5
 generator = square_root_generator(limit)
 
-for sqrt_value in generator:
-    print(sqrt_value)
+[sqrt_value for sqrt_value in generator]
 #+end_src
 
 #+RESULTS:
-: 1.0
-: 1.4142135623730951
-: 1.7320508075688772
-: 2.0
-: 2.23606797749979
+- 1.0
+- 1.4142135623730951
+- 1.7320508075688772
+- 2.0
+- 2.23606797749979
 
 ** What is the sum of the outputs of the generator for limit = 5?
 
@@ -61,36 +60,36 @@ sum([sqrt_value for sqrt_value in square_root_generator(limit=5)])
 :header-args+: :noweb yes
 :END:
 
-#+begin_src python :results output
+#+begin_src python
 def people_1():
     for i in range(1, 6):
         yield {"ID": i, "Name": f"Person_{i}", "Age": 25 + i, "City": "City_A"}
 
-for person in people_1():
-    print(person)
+[person for person in people_1()]
+#+end_src
 
+#+RESULTS:
+| ID | : | 1 | Name | : | Person_1 | Age | : | 26 | City | : | City_A |
+| ID | : | 2 | Name | : | Person_2 | Age | : | 27 | City | : | City_A |
+| ID | : | 3 | Name | : | Person_3 | Age | : | 28 | City | : | City_A |
+| ID | : | 4 | Name | : | Person_4 | Age | : | 29 | City | : | City_A |
+| ID | : | 5 | Name | : | Person_5 | Age | : | 30 | City | : | City_A |
+
+#+begin_src python
 def people_2():
     for i in range(3, 9):
         yield {"ID": i, "Name": f"Person_{i}", "Age": 30 + i, "City": "City_B", "Occupation": f"Job_{i}"}
 
-for person in people_2():
-    print(person)
+[person for person in people_2()]
 #+end_src
 
 #+RESULTS:
-#+begin_example
-{'ID': 1, 'Name': 'Person_1', 'Age': 26, 'City': 'City_A'}
-{'ID': 2, 'Name': 'Person_2', 'Age': 27, 'City': 'City_A'}
-{'ID': 3, 'Name': 'Person_3', 'Age': 28, 'City': 'City_A'}
-{'ID': 4, 'Name': 'Person_4', 'Age': 29, 'City': 'City_A'}
-{'ID': 5, 'Name': 'Person_5', 'Age': 30, 'City': 'City_A'}
-{'ID': 3, 'Name': 'Person_3', 'Age': 33, 'City': 'City_B', 'Occupation': 'Job_3'}
-{'ID': 4, 'Name': 'Person_4', 'Age': 34, 'City': 'City_B', 'Occupation': 'Job_4'}
-{'ID': 5, 'Name': 'Person_5', 'Age': 35, 'City': 'City_B', 'Occupation': 'Job_5'}
-{'ID': 6, 'Name': 'Person_6', 'Age': 36, 'City': 'City_B', 'Occupation': 'Job_6'}
-{'ID': 7, 'Name': 'Person_7', 'Age': 37, 'City': 'City_B', 'Occupation': 'Job_7'}
-{'ID': 8, 'Name': 'Person_8', 'Age': 38, 'City': 'City_B', 'Occupation': 'Job_8'}
-#+end_example
+| ID | : | 3 | Name | : | Person_3 | Age | : | 33 | City | : | City_B | Occupation | : | Job_3 |
+| ID | : | 4 | Name | : | Person_4 | Age | : | 34 | City | : | City_B | Occupation | : | Job_4 |
+| ID | : | 5 | Name | : | Person_5 | Age | : | 35 | City | : | City_B | Occupation | : | Job_5 |
+| ID | : | 6 | Name | : | Person_6 | Age | : | 36 | City | : | City_B | Occupation | : | Job_6 |
+| ID | : | 7 | Name | : | Person_7 | Age | : | 37 | City | : | City_B | Occupation | : | Job_7 |
+| ID | : | 8 | Name | : | Person_8 | Age | : | 38 | City | : | City_B | Occupation | : | Job_8 |
 
 
 #+begin_src python
