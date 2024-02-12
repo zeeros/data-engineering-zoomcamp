@@ -198,3 +198,54 @@ conn.sql("SELECT SUM(age) FROM people").df()
 - [ ] 365
 - [ ] 378
 - [ ] 390
+
+* Merge generators
+
+Merge the 2 generators using the ID column.
+
+#+begin_src python :session *workshop-1-data-ingestion* :noweb yes
+<<pipeline-run-replace>>
+
+pipeline.run(
+    people_2(),
+    table_name="people",
+    write_disposition="merge",
+    primary_key="id"
+)
+#+end_src
+
+#+RESULTS:
+: Pipeline dlt_pipeline load step completed in 0.28 seconds
+: 1 load package(s) were loaded to destination duckdb and into dataset people
+: The duckdb destination used duckdb:////home/i2cat/src/data-engineering-zoomcamp/workshop-1/cohorts/2024/workshops/dlt_pipeline.duckdb location to store data
+: Load package 1707745580.9475884 is LOADED and contains no failed jobs
+
+#+begin_src python :session *workshop-1-data-ingestion*
+conn.sql("SELECT * FROM people").df()
+#+end_src
+
+#+RESULTS:
+:    id      name  age    city        _dlt_load_id         _dlt_id occupation
+: 0   1  Person_1   26  City_A  1707745580.4430635  WSgSvaS7yxI0bQ       None
+: 1   2  Person_2   27  City_A  1707745580.4430635  UJAscHXw+iRQgA       None
+: 2   5  Person_5   35  City_B  1707745580.9475884  Jtqb0UNcqgYSsA      Job_5
+: 3   8  Person_8   38  City_B  1707745580.9475884  UZ66rgKA8yx8oA      Job_8
+: 4   4  Person_4   34  City_B  1707745580.9475884  FVUJRMBB8uAjww      Job_4
+: 5   7  Person_7   37  City_B  1707745580.9475884  fyrxzXzAx83x9w      Job_7
+: 6   3  Person_3   33  City_B  1707745580.9475884  fvnlxwl7yyonlA      Job_3
+: 7   6  Person_6   36  City_B  1707745580.9475884  0y8ymyVVa+Zh1w      Job_6
+
+Calculate the sum of ages of all the people loaded as described above.
+
+#+begin_src python :session *workshop-1-data-ingestion* :noweb yes
+<<sql-sum-age>>
+#+end_src
+
+#+RESULTS:
+:    sum(age)
+: 0     266.0
+
+- [ ] 215
+- [X] 266
+- [ ] 241
+- [ ] 258
