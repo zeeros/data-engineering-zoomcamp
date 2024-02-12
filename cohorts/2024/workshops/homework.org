@@ -185,11 +185,12 @@ conn.sql("SELECT * FROM people").df()
 
 After correctly appending the data, calculate the sum of all ages of people.
 
+#+name: sql-sum-age
 #+begin_src python :session *workshop-1-data-ingestion*
 conn.sql("SELECT SUM(age) FROM people").df()
 #+end_src
 
-#+RESULTS:
+#+RESULTS: sql-sum-age
 :    sum(age)
 : 0     353.0
 
