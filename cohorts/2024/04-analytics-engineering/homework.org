@@ -1,0 +1,87 @@
+:PROPERTIES:
+:header-args:python+: :results output
+:END:
+#+title: Module 4 Homework
+
+* Prerequisites
+
+#+begin_src python
+import os
+import requests
+
+os.makedirs("./datasets", exist_ok=True)
+
+services_years = {
+    "yellow": ["2019", "2020"],
+    "green": ["2019", "2020"],
+    "fhv": ["2019"]
+}
+
+saved = []
+failed = []
+for service, years in services_years.items():
+    for year in years:
+        for month in map(lambda x: str(x).zfill(2), range(1,  13)):
+            filename = f"{service}_tripdata_{year}-{month}.csv.gz"
+            file_path = os.path.join(os.getcwd(), f"datasets/{filename}")
+            url = f"https://github.com/DataTalksClub/nyc-tlc-data/releases/download/{service}/{filename}"
+
+            try:
+                response = requests.get(url)
+                response.raise_for_status()
+                with open(file_path, 'wb') as file:
+                    file.write(response.content)
+                saved.append(filename)
+            except requests.exceptions.RequestException as e:
+                failed.append(f"Error downloading {url}: {e}")
+
+print(f"{len(saved)} files saved, {len(failed)} failed")
+if failed:
+    for f in failed:
+        print(f)
+#+end_src
+
+#+RESULTS:
+: 60 files saved, 0 failed
+
+#+begin_src python
+import os
+import pandas as pd
+
+folder_path = './datasets'
+
+saved_parquet = 0
+for filename in os.listdir(folder_path):
+    if filename.endswith('.csv.gz'):
+        df = pd.read_csv(os.path.join(folder_path, filename), compression='gzip')
+        parquet_file_path = os.path.join(folder_path, filename.replace('.csv.gz', '.parquet'))
+        df.to_parquet(parquet_file_path, engine='pyarrow')
+        saved_parquet+=1
+print(f"{saved_parquet} files saved as parquet file")
+#+end_src
+
+#+RESULTS:
+: 60 files saved as parquet file
+
+#+begin_src python
+import os
+
+from google.cloud import storage
+
+os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = 'credentials.json'
+bucket_name = 'module-4-sfgasd'
+
+uploaded = 0
+for filename in os.listdir("./datasets"):
+    if filename.endswith('.parquet'):
+        client = storage.Client()
+        bucket = client.bucket(bucket_name)
+        blob = bucket.blob(f"{filename.split('_')[0]}/{filename}")
+        blob.upload_from_filename(os.path.join(os.getcwd(), f"datasets/{filename}"))
+        uploaded+=1
+
+print(f"{uploaded} files uploaded to GC")
+#+end_src
+
+#+RESULTS:
+: 60 files uploaded to GC
