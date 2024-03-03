@@ -1,0 +1,8 @@
+#+title: Module 5 Homework
+
+* TODO Spark version
+* TODO FHV October 2019 partition size
+* TODO Count records on 15th of October
+* TODO The longest trip
+* TODO Spark UI port
+* TODO Least frequent pickup location zone
