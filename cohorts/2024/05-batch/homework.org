@@ -1,6 +1,16 @@
 #+title: Module 5 Homework
 
-* TODO Spark version
+* Spark version
+
+#+begin_src python
+import pyspark
+
+return pyspark.__version__
+#+end_src
+
+#+RESULTS:
+: 3.5.1
+
 * TODO FHV October 2019 partition size
 * TODO Count records on 15th of October
 * TODO The longest trip
